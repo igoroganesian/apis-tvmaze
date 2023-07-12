@@ -14,7 +14,6 @@ const TVMAZE_URL = "http://api.tvmaze.com/search/shows";
  */
 
 async function getShowsByTerm(term) {
-  console.log('code running');
   let searchResults = await axios.get(`${TVMAZE_URL}?q=${term}`);
 
   let shows = searchResults.data.map((show) => (
@@ -22,13 +21,11 @@ async function getShowsByTerm(term) {
       id: show.show.id,
       name: show.show.name,
       summary: show.show.summary,
-      image: show.show.image.medium || "https://tinyurl.com/tv-missing"
+      image: show.show.image?.medium || ("https://tinyurl.com/tv-missing")
     }));
 
   return shows;
 }
-
-
 
 /** Given list of shows, create markup for each and append to DOM.
  *
@@ -40,6 +37,7 @@ function displayShows(shows) {
   $showsList.empty();
 
   for (const show of shows) {
+
     const $show = $(`
          <div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
@@ -69,7 +67,6 @@ function displayShows(shows) {
 
 async function searchShowsAndDisplay() {
   const term = $("#searchForm-term").val();
-  console.log(term);
   const shows = await getShowsByTerm(term);
 
   $episodesArea.hide();
