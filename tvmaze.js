@@ -13,41 +13,43 @@ const TVMAZE_URL = "http://api.tvmaze.com/search/shows";
  *    (if no image URL given by API, put in a default image URL)
  */
 
-
 async function getShowsByTerm(term) {
+  console.log('code running');
+  let searchResults = await axios.get(`${TVMAZE_URL}?q=${term}`);
 
-  const searchResults = await axios.get(`${TVMAZE_URL}?q=${term}`);
-  console.log(`the search result is: ${searchResults}`);
-  return searchResults;
+  let shows = searchResults.data.map((show) => (
+    {
+      id: show.show.id,
+      name: show.show.name,
+      summary: show.show.summary,
+      image: show.show.image.medium || "https://tinyurl.com/tv-missing"
+    }));
 
+  return shows;
 }
+
 
 
 /** Given list of shows, create markup for each and append to DOM.
  *
  * A show is {id, name, summary, image}
+ *
  * */
 
 function displayShows(shows) {
   $showsList.empty();
-  console.log('shows.data: ', shows.data[0]);
-  for (const show of shows.data) {
-    let picUrl;
-    if (show.show.image) {
-      picUrl = show.show.image.medium;
-    } else {
-      picUrl = "https://tinyurl.com/tv-missing";
-    }
+
+  for (const show of shows) {
     const $show = $(`
-         <div data-show-id="${show.show.id}" class="Show col-md-12 col-lg-6 mb-4">
+         <div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
-              src="${picUrl}"
+              src="${show.image}"
               alt="Show image"
               class="w-25 me-3">
            <div class="media-body">
-             <h5 class="text-primary">${show.show.name}</h5>
-             <div><small>${show.show.summary}</small></div>
+             <h5 class="text-primary">${show.name}</h5>
+             <div><small>${show.summary}</small></div>
              <button class="btn btn-outline-light btn-sm Show-getEpisodes">
                Episodes
              </button>
@@ -74,7 +76,7 @@ async function searchShowsAndDisplay() {
   displayShows(shows);
 }
 
-$searchForm.on("submit", async function handleSearchForm (evt) {
+$searchForm.on("submit", async function handleSearchForm(evt) {
   evt.preventDefault();
   await searchShowsAndDisplay();
 });
@@ -91,3 +93,6 @@ $searchForm.on("submit", async function handleSearchForm (evt) {
 // function displayEpisodes(episodes) { }
 
 // add other functions that will be useful / match our structure & design
+
+
+
