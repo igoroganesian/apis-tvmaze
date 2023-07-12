@@ -5,6 +5,7 @@ const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 
 const TVMAZE_URL = "http://api.tvmaze.com/search/shows";
+const MISSING_URL = "https://tinyurl.com/tv-missing";
 
 /** Given a search term, search for tv shows that match that query.
  *
@@ -13,15 +14,18 @@ const TVMAZE_URL = "http://api.tvmaze.com/search/shows";
  *    (if no image URL given by API, put in a default image URL)
  */
 
-async function getShowsByTerm(term) {
-  let searchResults = await axios.get(`${TVMAZE_URL}?q=${term}`);
+//TODO: {params: {q etc}}
 
-  let shows = searchResults.data.map((show) => (
+
+async function getShowsByTerm(term) {
+  const response = await axios.get(`${TVMAZE_URL}?q=${term}`);
+
+  const shows = response.data.map((show) => (
     {
       id: show.show.id,
       name: show.show.name,
       summary: show.show.summary,
-      image: show.show.image?.medium || ("https://tinyurl.com/tv-missing")
+      image: show.show.image?.medium || (MISSING_URL)
     }));
 
   return shows;
@@ -38,12 +42,13 @@ function displayShows(shows) {
 
   for (const show of shows) {
 
+   //TODO: avoid image in alt
     const $show = $(`
          <div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
               src="${show.image}"
-              alt="Show image"
+              alt="${show.name}"
               class="w-25 me-3">
            <div class="media-body">
              <h5 class="text-primary">${show.name}</h5>
