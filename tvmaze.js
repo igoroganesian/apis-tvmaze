@@ -5,6 +5,7 @@ const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 
 const TVMAZE_URL = "http://api.tvmaze.com/search/shows";
+const TVMAZE_EPS = "http://api.tvmaze.com/shows";
 const MISSING_URL = "https://tinyurl.com/tv-missing";
 
 /** Given a search term, search for tv shows that match that query.
@@ -14,12 +15,11 @@ const MISSING_URL = "https://tinyurl.com/tv-missing";
  *    (if no image URL given by API, put in a default image URL)
  */
 
-//TODO: {params: {q etc}}
 
 
 async function getShowsByTerm(term) {
-  const response = await axios.get(`${TVMAZE_URL}?q=${term}`);
-
+  const response = await axios.get(`${TVMAZE_URL}`, {params: {q: term}});
+  console.log(`The response: ${response}`);
   const shows = response.data.map((show) => (
     {
       id: show.show.id,
@@ -28,7 +28,7 @@ async function getShowsByTerm(term) {
       image: show.show.image?.medium || (MISSING_URL)
     }));
 
-  return shows;
+    return shows;
 }
 
 /** Given list of shows, create markup for each and append to DOM.
@@ -61,7 +61,9 @@ function displayShows(shows) {
        </div>
       `);
 
-    $showsList.append($show);
+    console.log("The this is", $(this));
+      $showsList.append($show);
+    $(".Show-getEpisodes").on("click", getEpisodesOfShow);
   }
 }
 
@@ -88,7 +90,19 @@ $searchForm.on("submit", async function handleSearchForm(evt) {
  *      { id, name, season, number }
  */
 
-// async function getEpisodesOfShow(id) { }
+//return array of objects with id, name, season, number
+async function getEpisodesOfShow(evt) {
+  showId = evt.target.this.id;
+  let response = await axios.get(`${TVMAZE_EPS}/${showId}/episodes`);
+  console.log(response);
+
+
+}
+
+
+
+
+
 
 /** Write a clear docstring for this function... */
 
